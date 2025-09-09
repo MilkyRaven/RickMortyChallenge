@@ -11,7 +11,6 @@ type EpisodesProviderProps = {
 type EpisodesContextType = {
     episodes: EpisodeItem[]
     totalEpisodes: number | null
-    getEpisodeById: (id: number) => Promise<EpisodeItem | null>
     loading: boolean
     refreshing: boolean
     loadMore: () => void
@@ -47,29 +46,12 @@ export const EpisodesProvider = ({ children }: EpisodesProviderProps) => {
     const loadMore = () => fetchEpisodes(page + 1)
     const refresh = () => fetchEpisodes(1)
 
-    const getEpisodeById = useCallback(async (id: number) => {
-        setLoading(true)
-        try {
-            const result = await api.getEpisodeById(id)
-            switch (result.kind) {
-                case "ok":
-                    return result.episode
-                case "not-found":
-                    return null
-                default:
-                    console.warn("API returned", result.kind)
-                    return null
-            }
-        } finally {
-            setLoading(false)
-        }
-    }, [])
     useEffect(() => {
         fetchEpisodes(defaultPage)
     }, [fetchEpisodes])
     return (
         <EpisodesContext.Provider
-            value={{ episodes, totalEpisodes, getEpisodeById, loading, refreshing, loadMore, refresh }}
+            value={{ episodes, totalEpisodes, loading, refreshing, loadMore, refresh }}
         >
             {children}
         </EpisodesContext.Provider>

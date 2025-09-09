@@ -3,7 +3,7 @@ import { ApiResponse, ApisauceInstance, create } from "apisauce"
 import Config from "@/config"
 
 import { GeneralApiProblem, getGeneralApiProblem } from "./apiProblem"
-import type { ApiConfig, EpisodeItem, EpisodesResponse } from "./types"
+import type { ApiConfig, CharacterItem, EpisodeItem, EpisodesResponse } from "./types"
 
 export const DEFAULT_API_CONFIG: ApiConfig = {
   url: Config.API_URL,
@@ -71,6 +71,31 @@ export class Api {
       return { kind: "bad-data" }
     }
   }
-}
 
+  async getCharactersByIds(
+    ids: number[],
+  ): Promise<{ kind: "ok"; characters: CharacterItem[] } | GeneralApiProblem> {
+    const response: ApiResponse<CharacterItem[]> = await this.apisauce.get(
+      `/character/${ids.join(",")}`,
+    )
+
+    if (!response.ok) {
+      const problem = getGeneralApiProblem(response)
+      if (problem) return problem
+    }
+
+    if (!response.data) {
+      return { kind: "not-found" }
+    }
+
+    try {
+      return { kind: "ok", characters: response.data }
+    } catch (e) {
+      if (__DEV__ && e instanceof Error) {
+        console.error("Bad data", e.message, e.stack)
+      }
+      return { kind: "bad-data" }
+    }
+  }
+}
 export const api = new Api()

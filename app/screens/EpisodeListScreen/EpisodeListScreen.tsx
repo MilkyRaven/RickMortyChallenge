@@ -22,6 +22,7 @@ export const EpisodeListScreen: FC = () => {
   return (
     <Screen preset="fixed" safeAreaEdges={["top", "bottom"]} contentContainerStyle={styles.screenContainer}>
       {/* actualizar activity indicator, se ve descentrado */}
+      <Text size="xl" weight="bold" style={{ marginVertical: 16 }}>Rick and Morty List of Episodes</Text>
       {loading && episodes.length === 0 && <ActivityIndicator size="large" />}
 
       <FlatList
@@ -63,6 +64,7 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   headerContainer: {
+
     backgroundColor: "#ddd",
     paddingHorizontal: 16,
     paddingVertical: 8,
