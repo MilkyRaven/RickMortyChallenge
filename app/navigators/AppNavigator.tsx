@@ -49,6 +49,7 @@ const AppStack = () => {
         options={{
           headerShown: true,
           headerTitle: "",
+          headerBackTitle: "Back to Episodes",
         }}
       />
       {/* IGNITE_GENERATOR_ANCHOR_APP_STACK_SCREENS */}
