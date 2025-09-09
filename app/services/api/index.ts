@@ -47,6 +47,30 @@ export class Api {
       return { kind: "bad-data" }
     }
   }
+
+  async getEpisodeById(
+    id: number,
+  ): Promise<{ kind: "ok"; episode: EpisodeItem } | GeneralApiProblem> {
+    const response: ApiResponse<EpisodeItem> = await this.apisauce.get(`/episode/${id}`)
+
+    if (!response.ok) {
+      const problem = getGeneralApiProblem(response)
+      if (problem) return problem
+    }
+    if (!response.data) {
+      return { kind: "not-found" }
+    }
+
+    try {
+      const episode: EpisodeItem = response.data
+      return { kind: "ok", episode }
+    } catch (e) {
+      if (__DEV__ && e instanceof Error) {
+        console.error(`Bad data: ${e.message}\n${response.data}`, e.stack)
+      }
+      return { kind: "bad-data" }
+    }
+  }
 }
 
 export const api = new Api()
