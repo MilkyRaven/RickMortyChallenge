@@ -8,8 +8,8 @@ import { useEpisodes } from "@/context/EpisodeContext"
 import { AppStackScreenProps } from "@/navigators/AppNavigator"
 // import { useAppTheme } from "@/theme/context"
 
-export const WelcomeScreen: FC = () => {
-  const navigation = useNavigation<AppStackScreenProps<"Welcome">["navigation"]>()
+export const EpisodeListScreen: FC = () => {
+  const navigation = useNavigation<AppStackScreenProps<"EpisodeListScreen">["navigation"]>()
   // const { themed } = useAppTheme()
   const { episodes, totalEpisodes, loading, refreshing, loadMore, refresh } = useEpisodes()
 

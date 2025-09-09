@@ -3,16 +3,15 @@ import { NavigationContainer } from "@react-navigation/native"
 import { createNativeStackNavigator, NativeStackScreenProps } from "@react-navigation/native-stack"
 
 import Config from "@/config"
+import { EpisodeListScreen } from "@/screens/EpisodeListScreen"
 import { EpisodeScreen } from "@/screens/EpisodeScreen"
 import { ErrorBoundary } from "@/screens/ErrorScreen/ErrorBoundary"
-import { WelcomeScreen } from "@/screens/WelcomeScreen"
 import { useAppTheme } from "@/theme/context"
 
 import { navigationRef, useBackButtonHandler } from "./navigationUtilities"
-import { Button } from "@/components/Button"
 
 export type AppStackParamList = {
-  Welcome: undefined
+  EpisodeListScreen: undefined
   // 🔥 Your screens go here
   EpisodeScreen: { episodeId: number }
   // IGNITE_GENERATOR_ANCHOR_APP_STACK_PARAM_LIST
@@ -42,7 +41,7 @@ const AppStack = () => {
         },
       }}
     >
-      <Stack.Screen name="Welcome" component={WelcomeScreen} />
+      <Stack.Screen name="EpisodeListScreen" component={EpisodeListScreen} />
       {/** 🔥 Your screens go here */}
       <Stack.Screen
         name="EpisodeScreen"
