@@ -1,82 +1,57 @@
-import { FC } from "react"
-import { Image, ImageStyle, TextStyle, View, ViewStyle } from "react-native"
+import { FC, useEffect, useState } from "react"
+import { View, FlatList } from "react-native"
 
 import { Screen } from "@/components/Screen"
 import { Text } from "@/components/Text"
-import { isRTL } from "@/i18n"
+import { api } from "@/services/api"
+import type { EpisodeItem } from "@/services/api/types"
 import { useAppTheme } from "@/theme/context"
-import { $styles } from "@/theme/styles"
-import type { ThemedStyle } from "@/theme/types"
-import { useSafeAreaInsetsStyle } from "@/utils/useSafeAreaInsetsStyle"
 
-const welcomeLogo = require("@assets/images/logo.png")
-const welcomeFace = require("@assets/images/welcome-face.png")
+export const WelcomeScreen: FC = () => {
+  const { themed } = useAppTheme()
+  const [episodes, setEpisodes] = useState<EpisodeItem[]>([])
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
-export const WelcomeScreen: FC = function WelcomeScreen() {
-  const { themed, theme } = useAppTheme()
+  useEffect(() => {
+    const fetchEpisodes = async () => {
+      setLoading(true)
+      setError(null)
+      try {
+        const result = await api.getEpisodes()
+        if (result.kind === "ok") {
+          setEpisodes(result.episodes)
+        } else {
+          setError("Failed to load episodes")
+        }
+      } catch (err) {
+        console.log(err)
+        setError("Error fetching episodes")
+      } finally {
+        setLoading(false)
+      }
+    }
 
-  const $bottomContainerInsets = useSafeAreaInsetsStyle(["bottom"])
+    fetchEpisodes()
+  }, [])
 
   return (
-    <Screen preset="fixed" contentContainerStyle={$styles.flex1}>
-      <View style={themed($topContainer)}>
-        <Image style={themed($welcomeLogo)} source={welcomeLogo} resizeMode="contain" />
-        <Text
-          testID="welcome-heading"
-          style={themed($welcomeHeading)}
-          tx="welcomeScreen:readyForLaunch"
-          preset="heading"
-        />
-        <Text tx="welcomeScreen:exciting" preset="subheading" />
-        <Image
-          style={$welcomeFace}
-          source={welcomeFace}
-          resizeMode="contain"
-          tintColor={theme.colors.palette.neutral900}
-        />
-      </View>
+    <Screen preset="fixed" contentContainerStyle={{ flex: 1, padding: 16 }}>
+      {loading && <Text text="Loading..." />}
+      {error && <Text text={error} />}
 
-      <View style={themed([$bottomContainer, $bottomContainerInsets])}>
-        <Text tx="welcomeScreen:postscript" size="md" />
-      </View>
+      <FlatList
+        data={episodes}
+        keyExtractor={(item) => item.id.toString()}
+        renderItem={({ item }) => (
+          <View
+            style={{ marginVertical: 8, padding: 12, backgroundColor: "#eee", borderRadius: 8 }}>
+            <Text weight="bold">{item.name}</Text>
+            <Text>{item.episode}</Text>
+            <Text>{item.air_date}</Text>
+          </View>
+        )}
+      />
     </Screen>
   )
 }
-
-const $topContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({
-  flexShrink: 1,
-  flexGrow: 1,
-  flexBasis: "57%",
-  justifyContent: "center",
-  paddingHorizontal: spacing.lg,
-})
-
-const $bottomContainer: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
-  flexShrink: 1,
-  flexGrow: 0,
-  flexBasis: "43%",
-  backgroundColor: colors.palette.neutral100,
-  borderTopLeftRadius: 16,
-  borderTopRightRadius: 16,
-  paddingHorizontal: spacing.lg,
-  justifyContent: "space-around",
-})
-
-const $welcomeLogo: ThemedStyle<ImageStyle> = ({ spacing }) => ({
-  height: 88,
-  width: "100%",
-  marginBottom: spacing.xxl,
-})
-
-const $welcomeFace: ImageStyle = {
-  height: 169,
-  width: 269,
-  position: "absolute",
-  bottom: -47,
-  right: -80,
-  transform: [{ scaleX: isRTL ? -1 : 1 }],
-}
-
-const $welcomeHeading: ThemedStyle<TextStyle> = ({ spacing }) => ({
-  marginBottom: spacing.md,
-})

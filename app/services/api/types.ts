@@ -1,26 +1,21 @@
-/**
- * These types indicate the shape of the data you expect to receive from your
- * API endpoint, assuming it's a JSON object like we have.
- */
 export interface EpisodeItem {
-  title: string
-  pubDate: string
-  link: string
-  guid: string
-  author: string
-  thumbnail: string
-  description: string
-  content: string
-  enclosure: {
-    link: string
-    type: string
-    length: number
-    duration: number
-    rating: { scheme: string; value: string }
-  }
-  categories: string[]
+  id: number
+  name: string
+  air_date: string
+  episode: string
+  characters: string[]
+  url: string
+  created: string
 }
-
+export interface EpisodesResponse {
+  info: {
+    count: number
+    pages: number
+    next: string | null
+    prev: string | null
+  }
+  results: EpisodeItem[]
+}
 export interface ApiFeedResponse {
   status: string
   feed: {
