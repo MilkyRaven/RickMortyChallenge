@@ -3,8 +3,8 @@ import { NavigationContainer } from "@react-navigation/native"
 import { createNativeStackNavigator, NativeStackScreenProps } from "@react-navigation/native-stack"
 
 import Config from "@/config"
-import { EpisodeListScreen } from "@/screens/EpisodeListScreen"
-import { EpisodeScreen } from "@/screens/EpisodeScreen"
+import { EpisodeListScreen } from "@/screens/EpisodeListScreen/EpisodeListScreen"
+import { EpisodeScreen } from "@/screens/EpisodeDetailScreen/EpisodeDetailScreen"
 import { ErrorBoundary } from "@/screens/ErrorScreen/ErrorBoundary"
 import { useAppTheme } from "@/theme/context"
 

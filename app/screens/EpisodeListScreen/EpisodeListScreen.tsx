@@ -1,4 +1,4 @@
-import { FC } from "react"
+import { FC, useCallback } from "react"
 import { View, FlatList, ActivityIndicator, StyleSheet } from "react-native"
 import { useNavigation } from "@react-navigation/native"
 
@@ -7,6 +7,7 @@ import { Screen } from "@/components/Screen"
 import { Text } from "@/components/Text"
 import { useEpisodes } from "@/context/EpisodeContext"
 import { AppStackScreenProps } from "@/navigators/AppNavigator"
+import { EpisodeListItem } from "./EpisodeListItem"
 // import { useAppTheme } from "@/theme/context"
 
 export const EpisodeListScreen: FC = () => {
@@ -14,18 +15,10 @@ export const EpisodeListScreen: FC = () => {
   // const { themed } = useAppTheme()
   const { episodes, totalEpisodes, loading, refreshing, loadMore, refresh } = useEpisodes()
 
-  const renderItem = ({ item }: { item: (typeof episodes)[0] }) => (
-    <ListItem
-      onPress={() => navigation.navigate("EpisodeScreen", { episodeId: item.id })}
-      bottomSeparator
-      text={item.name}
-      RightComponent={<Text>{item.episode}</Text>}
-      LeftComponent={<Text>{item.air_date}</Text>}
-      // style={styles.listItem}
-      height={100}
-    />
+  const renderItem = useCallback(
+    ({ item }: { item: (typeof episodes)[0] }) => <EpisodeListItem episode={item} />,
+    []
   )
-
   return (
     <Screen preset="fixed" contentContainerStyle={styles.screenContainer}>
       {/* actualizar activity indicator, se ve descentrado */}
