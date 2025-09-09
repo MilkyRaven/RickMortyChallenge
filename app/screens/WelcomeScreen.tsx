@@ -1,30 +1,23 @@
 import { FC } from "react"
-import { View, FlatList, ActivityIndicator } from "react-native"
+import { View, FlatList, ActivityIndicator, StyleSheet } from "react-native"
 
 import { Screen } from "@/components/Screen"
-import { useEpisodes } from "@/context/EpisodeContext"
-import { useAppTheme } from "@/theme/context"
 import { Text } from "@/components/Text"
+import { useEpisodes } from "@/context/EpisodeContext"
+// import { useAppTheme } from "@/theme/context"
 
 export const WelcomeScreen: FC = () => {
-  const { themed } = useAppTheme()
+  // const { themed } = useAppTheme()
   const { episodes, totalEpisodes, loading, refreshing, loadMore, refresh } = useEpisodes()
 
   return (
-    <Screen preset="fixed" contentContainerStyle={{ flex: 1, padding: 16 }}>
+    <Screen preset="fixed" contentContainerStyle={styles.screenContainer}>
       {/* actualizar activity indicator, se ve descentrado */}
       {loading && episodes.length === 0 && <ActivityIndicator size="large" />}
 
       <FlatList
         ListHeaderComponent={() => (
-          <View
-            style={{
-              padding: 12,
-              backgroundColor: "#fff",
-              borderBottomWidth: 1,
-              borderBottomColor: "#ddd",
-            }}
-          >
+          <View style={styles.headerContainer}>
             <Text weight="bold">
               Mostrando {episodes.length} de {totalEpisodes} episodios
             </Text>
@@ -38,8 +31,7 @@ export const WelcomeScreen: FC = () => {
         onEndReachedThreshold={0.5}
         stickyHeaderIndices={[0]}
         renderItem={({ item }) => (
-          <View
-            style={{ marginVertical: 8, padding: 12, backgroundColor: "#eee", borderRadius: 8 }}>
+          <View style={styles.itemContainer}>
             <Text weight="bold">{item.name}</Text>
             <Text>{item.episode}</Text>
             <Text>{item.air_date}</Text>
@@ -47,10 +39,11 @@ export const WelcomeScreen: FC = () => {
         )}
         ListFooterComponent={() => {
           if (episodes.length === 0) return null
-          if (episodes.length >= 51) { //modificar por una variable
+          if (episodes.length >= 51) {
+            //modificar por una variable
             return (
-              <View style={{ padding: 16, alignItems: "center" }}>
-                <Text text="¡Eso es todo! 😁" size="sm" color="#bababaff" />
+              <View style={styles.footerContainer}>
+                <Text text="¡Eso es todo! 😁" size="sm" />
               </View>
             )
           }
@@ -60,3 +53,26 @@ export const WelcomeScreen: FC = () => {
     </Screen>
   )
 }
+
+const styles = StyleSheet.create({
+  footerContainer: {
+    alignItems: "center",
+    padding: 16,
+  },
+  headerContainer: {
+    // backgroundColor: "#fff",
+    // borderBottomColor: "#ddd",
+    borderBottomWidth: 1,
+    padding: 12,
+  },
+  itemContainer: {
+    borderRadius: 8,
+    marginVertical: 8,
+    padding: 12,
+    // backgroundColor: "#eee",
+  },
+  screenContainer: {
+    flex: 1,
+    padding: 16,
+  },
+})
