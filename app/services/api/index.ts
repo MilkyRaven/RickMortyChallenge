@@ -1,35 +1,19 @@
-/**
- * This Api class lets you define an API endpoint and methods to request
- * data and process it.
- *
- * See the [Backend API Integration](https://docs.infinite.red/ignite-cli/boilerplate/app/services/#backend-api-integration)
- * documentation for more details.
- */
-import { ApisauceInstance, create } from "apisauce"
+import { ApiResponse, ApisauceInstance, create } from "apisauce"
 
 import Config from "@/config"
 
-import type { ApiConfig } from "./types"
+import { GeneralApiProblem, getGeneralApiProblem } from "./apiProblem"
+import type { ApiConfig, EpisodeItem, EpisodesResponse } from "./types"
 
-/**
- * Configuring the apisauce instance.
- */
 export const DEFAULT_API_CONFIG: ApiConfig = {
   url: Config.API_URL,
   timeout: 10000,
 }
 
-/**
- * Manages all requests to the API. You can use this class to build out
- * various requests that you need to call from your backend API.
- */
 export class Api {
   apisauce: ApisauceInstance
   config: ApiConfig
 
-  /**
-   * Set up our API instance. Keep this lightweight!
-   */
   constructor(config: ApiConfig = DEFAULT_API_CONFIG) {
     this.config = config
     this.apisauce = create({
@@ -40,7 +24,53 @@ export class Api {
       },
     })
   }
+
+  async getEpisodes(
+    page: number = 1,
+  ): Promise<
+    { kind: "ok"; episodes: EpisodeItem[]; totalCount: number | null } | GeneralApiProblem
+  > {
+    const response: ApiResponse<EpisodesResponse> = await this.apisauce.get(`/episode?page=${page}`)
+    if (!response.ok) {
+      const problem = getGeneralApiProblem(response)
+      if (problem) return problem
+    }
+    try {
+      const rawData = response.data
+      const episodes: EpisodeItem[] = rawData?.results ?? []
+      const totalCount: number | null = rawData?.info?.count ?? null
+      return { kind: "ok", episodes, totalCount }
+    } catch (e) {
+      if (__DEV__ && e instanceof Error) {
+        console.error(`Bad data: ${e.message}\n${response.data}`, e.stack)
+      }
+      return { kind: "bad-data" }
+    }
+  }
+
+  async getEpisodeById(
+    id: number,
+  ): Promise<{ kind: "ok"; episode: EpisodeItem } | GeneralApiProblem> {
+    const response: ApiResponse<EpisodeItem> = await this.apisauce.get(`/episode/${id}`)
+
+    if (!response.ok) {
+      const problem = getGeneralApiProblem(response)
+      if (problem) return problem
+    }
+    if (!response.data) {
+      return { kind: "not-found" }
+    }
+
+    try {
+      const episode: EpisodeItem = response.data
+      return { kind: "ok", episode }
+    } catch (e) {
+      if (__DEV__ && e instanceof Error) {
+        console.error(`Bad data: ${e.message}\n${response.data}`, e.stack)
+      }
+      return { kind: "bad-data" }
+    }
+  }
 }
 
-// Singleton instance of the API for convenience
 export const api = new Api()

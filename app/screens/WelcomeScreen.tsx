@@ -1,82 +1,62 @@
 import { FC } from "react"
-import { Image, ImageStyle, TextStyle, View, ViewStyle } from "react-native"
+import { View, FlatList, ActivityIndicator } from "react-native"
 
 import { Screen } from "@/components/Screen"
-import { Text } from "@/components/Text"
-import { isRTL } from "@/i18n"
+import { useEpisodes } from "@/context/EpisodeContext"
 import { useAppTheme } from "@/theme/context"
-import { $styles } from "@/theme/styles"
-import type { ThemedStyle } from "@/theme/types"
-import { useSafeAreaInsetsStyle } from "@/utils/useSafeAreaInsetsStyle"
+import { Text } from "@/components/Text"
 
-const welcomeLogo = require("@assets/images/logo.png")
-const welcomeFace = require("@assets/images/welcome-face.png")
-
-export const WelcomeScreen: FC = function WelcomeScreen() {
-  const { themed, theme } = useAppTheme()
-
-  const $bottomContainerInsets = useSafeAreaInsetsStyle(["bottom"])
+export const WelcomeScreen: FC = () => {
+  const { themed } = useAppTheme()
+  const { episodes, totalEpisodes, loading, refreshing, loadMore, refresh } = useEpisodes()
 
   return (
-    <Screen preset="fixed" contentContainerStyle={$styles.flex1}>
-      <View style={themed($topContainer)}>
-        <Image style={themed($welcomeLogo)} source={welcomeLogo} resizeMode="contain" />
-        <Text
-          testID="welcome-heading"
-          style={themed($welcomeHeading)}
-          tx="welcomeScreen:readyForLaunch"
-          preset="heading"
-        />
-        <Text tx="welcomeScreen:exciting" preset="subheading" />
-        <Image
-          style={$welcomeFace}
-          source={welcomeFace}
-          resizeMode="contain"
-          tintColor={theme.colors.palette.neutral900}
-        />
-      </View>
+    <Screen preset="fixed" contentContainerStyle={{ flex: 1, padding: 16 }}>
+      {/* actualizar activity indicator, se ve descentrado */}
+      {loading && episodes.length === 0 && <ActivityIndicator size="large" />}
 
-      <View style={themed([$bottomContainer, $bottomContainerInsets])}>
-        <Text tx="welcomeScreen:postscript" size="md" />
-      </View>
+      <FlatList
+        ListHeaderComponent={() => (
+          <View
+            style={{
+              padding: 12,
+              backgroundColor: "#fff",
+              borderBottomWidth: 1,
+              borderBottomColor: "#ddd",
+            }}
+          >
+            <Text weight="bold">
+              Mostrando {episodes.length} de {totalEpisodes} episodios
+            </Text>
+          </View>
+        )}
+        data={episodes}
+        keyExtractor={(item) => item.id.toString()}
+        onRefresh={refresh}
+        refreshing={refreshing}
+        onEndReached={loadMore}
+        onEndReachedThreshold={0.5}
+        stickyHeaderIndices={[0]}
+        renderItem={({ item }) => (
+          <View
+            style={{ marginVertical: 8, padding: 12, backgroundColor: "#eee", borderRadius: 8 }}>
+            <Text weight="bold">{item.name}</Text>
+            <Text>{item.episode}</Text>
+            <Text>{item.air_date}</Text>
+          </View>
+        )}
+        ListFooterComponent={() => {
+          if (episodes.length === 0) return null
+          if (episodes.length >= 51) { //modificar por una variable
+            return (
+              <View style={{ padding: 16, alignItems: "center" }}>
+                <Text text="¡Eso es todo! 😁" size="sm" color="#bababaff" />
+              </View>
+            )
+          }
+          return null
+        }}
+      />
     </Screen>
   )
 }
-
-const $topContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({
-  flexShrink: 1,
-  flexGrow: 1,
-  flexBasis: "57%",
-  justifyContent: "center",
-  paddingHorizontal: spacing.lg,
-})
-
-const $bottomContainer: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
-  flexShrink: 1,
-  flexGrow: 0,
-  flexBasis: "43%",
-  backgroundColor: colors.palette.neutral100,
-  borderTopLeftRadius: 16,
-  borderTopRightRadius: 16,
-  paddingHorizontal: spacing.lg,
-  justifyContent: "space-around",
-})
-
-const $welcomeLogo: ThemedStyle<ImageStyle> = ({ spacing }) => ({
-  height: 88,
-  width: "100%",
-  marginBottom: spacing.xxl,
-})
-
-const $welcomeFace: ImageStyle = {
-  height: 169,
-  width: 269,
-  position: "absolute",
-  bottom: -47,
-  right: -80,
-  transform: [{ scaleX: isRTL ? -1 : 1 }],
-}
-
-const $welcomeHeading: ThemedStyle<TextStyle> = ({ spacing }) => ({
-  marginBottom: spacing.md,
-})
