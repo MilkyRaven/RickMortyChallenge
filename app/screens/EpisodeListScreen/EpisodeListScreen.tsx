@@ -1,28 +1,31 @@
 import { FC, useCallback } from "react"
 import { View, FlatList, ActivityIndicator, StyleSheet } from "react-native"
-import { useNavigation } from "@react-navigation/native"
 
-import { ListItem } from "@/components/ListItem"
 import { Screen } from "@/components/Screen"
 import { Text } from "@/components/Text"
 import { useEpisodes } from "@/context/EpisodeContext"
-import { AppStackScreenProps } from "@/navigators/AppNavigator"
+import { colors } from "@/theme/colors"
+
 import { EpisodeListItem } from "./EpisodeListItem"
 // import { useAppTheme } from "@/theme/context"
 
 export const EpisodeListScreen: FC = () => {
-  const navigation = useNavigation<AppStackScreenProps<"EpisodeListScreen">["navigation"]>()
-  // const { themed } = useAppTheme()
   const { episodes, totalEpisodes, loading, refreshing, loadMore, refresh } = useEpisodes()
 
   const renderItem = useCallback(
     ({ item }: { item: (typeof episodes)[0] }) => <EpisodeListItem episode={item} />,
-    []
+    [],
   )
   return (
-    <Screen preset="fixed" safeAreaEdges={["top", "bottom"]} contentContainerStyle={styles.screenContainer}>
+    <Screen
+      preset="fixed"
+      safeAreaEdges={["top", "bottom"]}
+      contentContainerStyle={styles.screenContainer}
+    >
       {/* actualizar activity indicator, se ve descentrado */}
-      <Text size="xl" weight="bold" style={{ marginVertical: 16 }}>Rick and Morty List of Episodes</Text>
+      <Text size="xl" weight="bold" style={styles.margin}>
+        Rick and Morty List of Episodes
+      </Text>
       {loading && episodes.length === 0 && <ActivityIndicator size="large" />}
 
       <FlatList
@@ -64,12 +67,13 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   headerContainer: {
-
-    backgroundColor: "#ddd",
+    backgroundColor: colors.palette.neutral200,
+    marginBottom: 16,
     paddingHorizontal: 16,
     paddingVertical: 8,
-    marginBottom: 16,
-    borderRadius: 8,
+  },
+  margin: {
+    marginVertical: 16,
   },
   screenContainer: {
     flex: 1,

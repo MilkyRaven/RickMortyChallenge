@@ -3,8 +3,8 @@ import { NavigationContainer } from "@react-navigation/native"
 import { createNativeStackNavigator, NativeStackScreenProps } from "@react-navigation/native-stack"
 
 import Config from "@/config"
-import { EpisodeListScreen } from "@/screens/EpisodeListScreen/EpisodeListScreen"
 import { EpisodeScreen } from "@/screens/EpisodeDetailScreen/EpisodeDetailScreen"
+import { EpisodeListScreen } from "@/screens/EpisodeListScreen/EpisodeListScreen"
 import { ErrorBoundary } from "@/screens/ErrorScreen/ErrorBoundary"
 import { useAppTheme } from "@/theme/context"
 
@@ -50,6 +50,7 @@ const AppStack = () => {
           headerShown: true,
           headerTitle: "",
           headerBackTitle: "Back to Episodes",
+          headerTintColor: colors.palette.secondary500,
         }}
       />
       {/* IGNITE_GENERATOR_ANCHOR_APP_STACK_SCREENS */}
@@ -58,7 +59,7 @@ const AppStack = () => {
 }
 
 export interface NavigationProps
-  extends Partial<ComponentProps<typeof NavigationContainer<AppStackParamList>>> { }
+  extends Partial<ComponentProps<typeof NavigationContainer<AppStackParamList>>> {}
 
 export const AppNavigator = (props: NavigationProps) => {
   const { navigationTheme } = useAppTheme()
