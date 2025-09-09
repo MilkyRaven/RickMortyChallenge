@@ -1,16 +1,18 @@
 /* eslint-disable prettier/prettier */
 import { useEffect, useState } from "react"
 import { View, ActivityIndicator, StyleSheet } from "react-native"
+import { NativeStackScreenProps } from "@react-navigation/native-stack"
 
 import { Text } from "@/components/Text"
 import { useEpisodes } from "@/context/EpisodeContext"
+import { AppStackParamList } from "@/navigators/AppNavigator"
 import type { EpisodeItem } from "@/services/api/types"
 
-interface EpisodeScreenProps {
-    episodeId: number
-}
 
-export const EpisodeScreen: React.FC<EpisodeScreenProps> = ({ episodeId }) => {
+type Props = NativeStackScreenProps<AppStackParamList, "EpisodeScreen">
+
+export const EpisodeScreen: React.FC<Props> = ({ route }) => {
+    const { episodeId } = route.params
     const { getEpisodeById } = useEpisodes()
     const [episode, setEpisode] = useState<EpisodeItem | null>(null)
     const [loading, setLoading] = useState(true)

@@ -1,12 +1,15 @@
 import { FC } from "react"
-import { View, FlatList, ActivityIndicator, StyleSheet } from "react-native"
+import { View, FlatList, ActivityIndicator, StyleSheet, TouchableOpacity } from "react-native"
+import { useNavigation } from "@react-navigation/native"
 
 import { Screen } from "@/components/Screen"
 import { Text } from "@/components/Text"
 import { useEpisodes } from "@/context/EpisodeContext"
+import { AppStackScreenProps } from "@/navigators/AppNavigator"
 // import { useAppTheme } from "@/theme/context"
 
 export const WelcomeScreen: FC = () => {
+  const navigation = useNavigation<AppStackScreenProps<"Welcome">["navigation"]>()
   // const { themed } = useAppTheme()
   const { episodes, totalEpisodes, loading, refreshing, loadMore, refresh } = useEpisodes()
 
@@ -31,15 +34,20 @@ export const WelcomeScreen: FC = () => {
         onEndReachedThreshold={0.5}
         stickyHeaderIndices={[0]}
         renderItem={({ item }) => (
-          <View style={styles.itemContainer}>
-            <Text weight="bold">{item.name}</Text>
-            <Text>{item.episode}</Text>
-            <Text>{item.air_date}</Text>
-          </View>
+          <TouchableOpacity
+            style={styles.itemContainer}
+            onPress={() => navigation.navigate("EpisodeScreen", { episodeId: item.id })}
+          >
+            <View style={styles.itemContainer}>
+              <Text weight="bold">{item.name}</Text>
+              <Text>{item.episode}</Text>
+              <Text>{item.air_date}</Text>
+            </View>
+          </TouchableOpacity>
         )}
         ListFooterComponent={() => {
           if (episodes.length === 0) return null
-          if (episodes.length >= 51) {
+          if (totalEpisodes && episodes.length >= totalEpisodes) {
             //modificar por una variable
             return (
               <View style={styles.footerContainer}>
