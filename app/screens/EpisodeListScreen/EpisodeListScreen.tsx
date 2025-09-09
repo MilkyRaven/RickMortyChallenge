@@ -20,7 +20,7 @@ export const EpisodeListScreen: FC = () => {
     []
   )
   return (
-    <Screen preset="fixed" contentContainerStyle={styles.screenContainer}>
+    <Screen preset="fixed" safeAreaEdges={["top", "bottom"]} contentContainerStyle={styles.screenContainer}>
       {/* actualizar activity indicator, se ve descentrado */}
       {loading && episodes.length === 0 && <ActivityIndicator size="large" />}
 
