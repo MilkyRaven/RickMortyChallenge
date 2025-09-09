@@ -28,7 +28,7 @@ export const EpisodeListScreen: FC = () => {
         ListHeaderComponent={() => (
           <View style={styles.headerContainer}>
             <Text weight="bold">
-              Mostrando {episodes.length} de {totalEpisodes} episodios
+              Showing {episodes.length} of {totalEpisodes} episodes
             </Text>
           </View>
         )}
@@ -46,7 +46,7 @@ export const EpisodeListScreen: FC = () => {
             //modificar por una variable
             return (
               <View style={styles.footerContainer}>
-                <Text text="¡Eso es todo! 😁" size="sm" />
+                <Text text="That's all for now! 🩷" size="sm" />
               </View>
             )
           }
@@ -63,10 +63,11 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   headerContainer: {
-    // backgroundColor: "#fff",
-    // borderBottomColor: "#ddd",
-    borderBottomWidth: 1,
-    padding: 12,
+    backgroundColor: "#ddd",
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    marginBottom: 16,
+    borderRadius: 8,
   },
   screenContainer: {
     flex: 1,
