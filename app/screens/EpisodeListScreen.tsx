@@ -1,7 +1,8 @@
 import { FC } from "react"
-import { View, FlatList, ActivityIndicator, StyleSheet, TouchableOpacity } from "react-native"
+import { View, FlatList, ActivityIndicator, StyleSheet } from "react-native"
 import { useNavigation } from "@react-navigation/native"
 
+import { ListItem } from "@/components/ListItem"
 import { Screen } from "@/components/Screen"
 import { Text } from "@/components/Text"
 import { useEpisodes } from "@/context/EpisodeContext"
@@ -12,6 +13,18 @@ export const EpisodeListScreen: FC = () => {
   const navigation = useNavigation<AppStackScreenProps<"EpisodeListScreen">["navigation"]>()
   // const { themed } = useAppTheme()
   const { episodes, totalEpisodes, loading, refreshing, loadMore, refresh } = useEpisodes()
+
+  const renderItem = ({ item }: { item: (typeof episodes)[0] }) => (
+    <ListItem
+      onPress={() => navigation.navigate("EpisodeScreen", { episodeId: item.id })}
+      bottomSeparator
+      text={item.name}
+      RightComponent={<Text>{item.episode}</Text>}
+      LeftComponent={<Text>{item.air_date}</Text>}
+      // style={styles.listItem}
+      height={100}
+    />
+  )
 
   return (
     <Screen preset="fixed" contentContainerStyle={styles.screenContainer}>
@@ -33,18 +46,7 @@ export const EpisodeListScreen: FC = () => {
         onEndReached={loadMore}
         onEndReachedThreshold={0.5}
         stickyHeaderIndices={[0]}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            style={styles.itemContainer}
-            onPress={() => navigation.navigate("EpisodeScreen", { episodeId: item.id })}
-          >
-            <View style={styles.itemContainer}>
-              <Text weight="bold">{item.name}</Text>
-              <Text>{item.episode}</Text>
-              <Text>{item.air_date}</Text>
-            </View>
-          </TouchableOpacity>
-        )}
+        renderItem={renderItem}
         ListFooterComponent={() => {
           if (episodes.length === 0) return null
           if (totalEpisodes && episodes.length >= totalEpisodes) {
@@ -72,12 +74,6 @@ const styles = StyleSheet.create({
     // borderBottomColor: "#ddd",
     borderBottomWidth: 1,
     padding: 12,
-  },
-  itemContainer: {
-    borderRadius: 8,
-    marginVertical: 8,
-    padding: 12,
-    // backgroundColor: "#eee",
   },
   screenContainer: {
     flex: 1,
