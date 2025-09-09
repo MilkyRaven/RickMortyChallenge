@@ -3,10 +3,12 @@ import { useEffect, useState } from "react"
 import { View, ActivityIndicator, StyleSheet } from "react-native"
 import { NativeStackScreenProps } from "@react-navigation/native-stack"
 
+import { FadeInView } from "@/components/FadeInView"
 import { Text } from "@/components/Text"
 import { useEpisodes } from "@/context/EpisodeContext"
 import { AppStackParamList } from "@/navigators/AppNavigator"
 import type { EpisodeItem } from "@/services/api/types"
+
 
 
 type Props = NativeStackScreenProps<AppStackParamList, "EpisodeScreen">
@@ -45,11 +47,13 @@ export const EpisodeScreen: React.FC<Props> = ({ route }) => {
     }
 
     return (
-        <View style={styles.container}>
-            <Text style={styles.title}>{episode.name}</Text>
-            <Text>Air date: {episode.air_date}</Text>
-            <Text>Episode code: {episode.episode}</Text>
-        </View>
+        <FadeInView>
+            <View style={styles.container}>
+                <Text style={styles.title}>{episode.name}</Text>
+                <Text>Air date: {episode.air_date}</Text>
+                <Text>Episode code: {episode.episode}</Text>
+            </View>
+        </FadeInView>
     )
 }
 
