@@ -1,5 +1,5 @@
 import { FC, useEffect, useState } from "react"
-import { View, FlatList } from "react-native"
+import { View, FlatList, ActivityIndicator } from "react-native"
 
 import { Screen } from "@/components/Screen"
 import { Text } from "@/components/Text"
@@ -11,38 +11,47 @@ export const WelcomeScreen: FC = () => {
   const { themed } = useAppTheme()
   const [episodes, setEpisodes] = useState<EpisodeItem[]>([])
   const [loading, setLoading] = useState(false)
+  const [refreshing, setRefreshing] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  useEffect(() => {
-    const fetchEpisodes = async () => {
-      setLoading(true)
-      setError(null)
-      try {
-        const result = await api.getEpisodes()
-        if (result.kind === "ok") {
-          setEpisodes(result.episodes)
-        } else {
-          setError("Failed to load episodes")
-        }
-      } catch (err) {
-        console.log(err)
-        setError("Error fetching episodes")
-      } finally {
-        setLoading(false)
+  const fetchEpisodes = async () => {
+    setLoading(true)
+    setError(null)
+    try {
+      const result = await api.getEpisodes()
+      if (result.kind === "ok") {
+        setEpisodes(result.episodes)
+      } else {
+        setError("Failed to load episodes")
       }
+    } catch (err) {
+      console.log(err)
+      setError("Error fetching episodes")
+    } finally {
+      setLoading(false)
     }
-
+  }
+  useEffect(() => {
     fetchEpisodes()
   }, [])
 
+  const handleRefresh = async () => {
+    setRefreshing(true)
+    await fetchEpisodes()
+    setRefreshing(false)
+  }
+
   return (
     <Screen preset="fixed" contentContainerStyle={{ flex: 1, padding: 16 }}>
-      {loading && <Text text="Loading..." />}
+      {/* actualizar activity indicator, se ve descentrado */}
+      {loading && <ActivityIndicator size="large" />}
       {error && <Text text={error} />}
 
       <FlatList
         data={episodes}
         keyExtractor={(item) => item.id.toString()}
+        onRefresh={handleRefresh}
+        refreshing={refreshing}
         renderItem={({ item }) => (
           <View
             style={{ marginVertical: 8, padding: 12, backgroundColor: "#eee", borderRadius: 8 }}>
