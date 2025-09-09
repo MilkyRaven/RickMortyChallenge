@@ -27,7 +27,9 @@ export class Api {
 
   async getEpisodes(
     page: number = 1,
-  ): Promise<{ kind: "ok"; episodes: EpisodeItem[] } | GeneralApiProblem> {
+  ): Promise<
+    { kind: "ok"; episodes: EpisodeItem[]; totalCount: number | null } | GeneralApiProblem
+  > {
     const response: ApiResponse<EpisodesResponse> = await this.apisauce.get(`/episode?page=${page}`)
     if (!response.ok) {
       const problem = getGeneralApiProblem(response)
@@ -36,8 +38,8 @@ export class Api {
     try {
       const rawData = response.data
       const episodes: EpisodeItem[] = rawData?.results ?? []
-
-      return { kind: "ok", episodes }
+      const totalCount: number | null = rawData?.info?.count ?? null
+      return { kind: "ok", episodes, totalCount }
     } catch (e) {
       if (__DEV__ && e instanceof Error) {
         console.error(`Bad data: ${e.message}\n${response.data}`, e.stack)

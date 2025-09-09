@@ -1,73 +1,42 @@
-import { FC, useEffect, useState } from "react"
+import { FC } from "react"
 import { View, FlatList, ActivityIndicator } from "react-native"
 
 import { Screen } from "@/components/Screen"
-import { Text } from "@/components/Text"
-import { api } from "@/services/api"
-import type { EpisodeItem } from "@/services/api/types"
+import { useEpisodes } from "@/context/EpisodeContext"
 import { useAppTheme } from "@/theme/context"
+import { Text } from "@/components/Text"
 
 export const WelcomeScreen: FC = () => {
   const { themed } = useAppTheme()
-  const [episodes, setEpisodes] = useState<EpisodeItem[]>([])
-  const [page, setPage] = useState(1)
-  const [loadingMore, setLoadingMore] = useState(false)
-  const [loading, setLoading] = useState(false)
-  const [refreshing, setRefreshing] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-
-  const loadMoreEpisodes = async () => {
-    if (loadingMore) return
-    setLoadingMore(true)
-    const result = await api.getEpisodes(page + 1)
-    if (result.kind === "ok") {
-      setEpisodes((prev) => [...prev, ...result.episodes])
-      setPage(page + 1)
-    }
-    setLoadingMore(false)
-  }
-
-  const fetchEpisodes = async () => {
-    setLoading(true)
-    setError(null)
-    try {
-      const result = await api.getEpisodes()
-      if (result.kind === "ok") {
-        setEpisodes(result.episodes)
-      } else {
-        setError("Failed to load episodes")
-      }
-    } catch (err) {
-      console.log(err)
-      setError("Error fetching episodes")
-    } finally {
-      setLoading(false)
-    }
-  }
-  useEffect(() => {
-    fetchEpisodes()
-  }, [])
-
-  const handleRefresh = async () => {
-    setRefreshing(true)
-    setPage(1)
-    await fetchEpisodes()
-    setRefreshing(false)
-  }
+  const { episodes, totalEpisodes, loading, refreshing, loadMore, refresh } = useEpisodes()
 
   return (
     <Screen preset="fixed" contentContainerStyle={{ flex: 1, padding: 16 }}>
       {/* actualizar activity indicator, se ve descentrado */}
-      {loading && <ActivityIndicator size="large" />}
-      {error && <Text text={error} />}
+      {loading && episodes.length === 0 && <ActivityIndicator size="large" />}
 
       <FlatList
+        ListHeaderComponent={() => (
+          <View
+            style={{
+              padding: 12,
+              backgroundColor: "#fff",
+              borderBottomWidth: 1,
+              borderBottomColor: "#ddd",
+            }}
+          >
+            <Text weight="bold">
+              Mostrando {episodes.length} de {totalEpisodes} episodios
+            </Text>
+          </View>
+        )}
         data={episodes}
         keyExtractor={(item) => item.id.toString()}
-        onRefresh={handleRefresh}
+        onRefresh={refresh}
         refreshing={refreshing}
-        onEndReached={loadMoreEpisodes}
+        onEndReached={loadMore}
         onEndReachedThreshold={0.5}
+        stickyHeaderIndices={[0]}
         renderItem={({ item }) => (
           <View
             style={{ marginVertical: 8, padding: 12, backgroundColor: "#eee", borderRadius: 8 }}>
@@ -76,6 +45,17 @@ export const WelcomeScreen: FC = () => {
             <Text>{item.air_date}</Text>
           </View>
         )}
+        ListFooterComponent={() => {
+          if (episodes.length === 0) return null
+          if (episodes.length >= 51) { //modificar por una variable
+            return (
+              <View style={{ padding: 16, alignItems: "center" }}>
+                <Text text="¡Eso es todo! 😁" size="sm" color="#bababaff" />
+              </View>
+            )
+          }
+          return null
+        }}
       />
     </Screen>
   )
