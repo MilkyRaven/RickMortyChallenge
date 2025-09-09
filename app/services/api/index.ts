@@ -25,8 +25,10 @@ export class Api {
     })
   }
 
-  async getEpisodes(): Promise<{ kind: "ok"; episodes: EpisodeItem[] } | GeneralApiProblem> {
-    const response: ApiResponse<EpisodesResponse> = await this.apisauce.get("/episode")
+  async getEpisodes(
+    page: number = 1,
+  ): Promise<{ kind: "ok"; episodes: EpisodeItem[] } | GeneralApiProblem> {
+    const response: ApiResponse<EpisodesResponse> = await this.apisauce.get(`/episode?page=${page}`)
     if (!response.ok) {
       const problem = getGeneralApiProblem(response)
       if (problem) return problem

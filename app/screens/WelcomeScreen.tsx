@@ -10,9 +10,22 @@ import { useAppTheme } from "@/theme/context"
 export const WelcomeScreen: FC = () => {
   const { themed } = useAppTheme()
   const [episodes, setEpisodes] = useState<EpisodeItem[]>([])
+  const [page, setPage] = useState(1)
+  const [loadingMore, setLoadingMore] = useState(false)
   const [loading, setLoading] = useState(false)
   const [refreshing, setRefreshing] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  const loadMoreEpisodes = async () => {
+    if (loadingMore) return
+    setLoadingMore(true)
+    const result = await api.getEpisodes(page + 1)
+    if (result.kind === "ok") {
+      setEpisodes((prev) => [...prev, ...result.episodes])
+      setPage(page + 1)
+    }
+    setLoadingMore(false)
+  }
 
   const fetchEpisodes = async () => {
     setLoading(true)
@@ -37,6 +50,7 @@ export const WelcomeScreen: FC = () => {
 
   const handleRefresh = async () => {
     setRefreshing(true)
+    setPage(1)
     await fetchEpisodes()
     setRefreshing(false)
   }
@@ -52,6 +66,8 @@ export const WelcomeScreen: FC = () => {
         keyExtractor={(item) => item.id.toString()}
         onRefresh={handleRefresh}
         refreshing={refreshing}
+        onEndReached={loadMoreEpisodes}
+        onEndReachedThreshold={0.5}
         renderItem={({ item }) => (
           <View
             style={{ marginVertical: 8, padding: 12, backgroundColor: "#eee", borderRadius: 8 }}>
